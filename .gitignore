@@ -1,0 +1,5 @@
+shot-*.jpeg
+.playwright-mcp/
+.DS_Store
+node_modules/
+.env
