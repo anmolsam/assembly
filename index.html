@@ -217,7 +217,7 @@
 <header class="hero wrap">
   <span class="badge"><span class="live"></span> Real-time meeting intelligence · Beam AI</span>
   <h1>The live sales copilot<br><span class="grad">that writes to HubSpot mid-call.</span></h1>
-  <p>Two ways to capture every Google Meet — a server-side <b>Recall.ai bot</b> for the fleet and a <b>Cluely-style desktop overlay</b> for invisible in-call coaching — both feeding one brain: live AssemblyAI transcription, the 9-question Beam BANT council, and real-time HubSpot sync.</p>
+  <p>A bot quietly joins <b>every</b> client call and understands it. The AE stays in control — the live copilot is theirs to glance at. Underneath: AssemblyAI transcription, the 9-question Beam <b>AI council</b>, a <b>deal bank</b> of every closed-won &amp; lost, live SERP/ICP intel, real-time HubSpot sync, and a Slack tap to the right human.</p>
   <div class="pills">
     <span class="pill">🤖 Recall.ai bot</span>
     <span class="pill">🫥 Desktop overlay</span>
@@ -294,8 +294,10 @@
       <div class="lname"><span class="ln">5 · Context</span><span class="ld">grounding</span></div>
       <div class="row">
         <div class="box hub"><div class="bt"><span class="bi">🟠</span>HubSpot deal context</div><p>Open deal, prior BANT, owner, stage — cached into the prompt.</p></div>
-        <div class="box"><div class="bt"><span class="bi">📋</span>Beam playbook & ICP</div><p>Supported trades, objection battlecards, competitor intel (Togal/Stack).</p></div>
-        <div class="box"><div class="bt"><span class="bi">🔎</span>Deal matching</div><p>External attendee email → contact → open deal in pipeline <span class="mono">676188492</span>.</p></div>
+        <div class="box live-b"><div class="bt"><span class="bi">🏆</span>Deal bank (won/lost)</div><p>Every closed-won &amp; lost embedded. Live retrieval: "this sounds like a deal you <b>won</b> / <b>lost</b>." Reuses <span class="mono">findSimilarWins()</span>.</p><span class="tagm" style="color:var(--green);border-color:rgba(66,245,155,.3)">RAG · realtime</span></div>
+        <div class="box"><div class="bt"><span class="bi">🌐</span>Live intel</div><p>SERP + Exa + ICP enrichment on the prospect's company, mid-call. Reuses the <span class="mono">icp-match</span> pipeline.</p></div>
+        <div class="box"><div class="bt"><span class="bi">📋</span>Beam playbook</div><p>Supported trades, objection battlecards, competitor intel (Togal/Stack).</p></div>
+        <div class="box"><div class="bt"><span class="bi">🔎</span>Deal matching</div><p>Attendee email → contact → open deal in pipeline <span class="mono">676188492</span>.</p></div>
       </div>
     </div>
     <div class="arch-down"><div class="ad">↓</div></div>
@@ -315,9 +317,10 @@
     <div class="layer">
       <div class="lname"><span class="ln">7 · Experience</span><span class="ld">who sees it</span></div>
       <div class="row">
-        <div class="box live-b"><div class="bt"><span class="bi">🫥</span>Rep live overlay</div><p>Invisible-to-prospect coaching + BANT meter while the rep talks.</p></div>
-        <div class="box"><div class="bt"><span class="bi">📊</span>Manager dashboard</div><p>Pipeline-wide qualification + coaching signals.</p></div>
-        <div class="box hub"><div class="bt"><span class="bi">🟠</span>The deal record</div><p>Qualified verdict + transcript, minutes after (or during) the call.</p></div>
+        <div class="box live-b"><div class="bt"><span class="bi">🫥</span>Rep live overlay</div><p>Invisible-to-prospect coaching + BANT meter. <b>AE opt-in</b> — glance when they want.</p></div>
+        <div class="box"><div class="bt"><span class="bi">💬</span>Slack auto-routing</div><p>Pings the right human on trigger: qualified, competitor named, big deal, at-risk, needs SE/approval.</p></div>
+        <div class="box"><div class="bt"><span class="bi">📊</span>Manager dashboard</div><p>Pipeline-wide qualification, journey stage + coaching signals.</p></div>
+        <div class="box hub"><div class="bt"><span class="bi">🟠</span>The deal record</div><p>Qualified verdict + transcript, during &amp; after the call.</p></div>
       </div>
     </div>
   </div>
@@ -429,6 +432,36 @@
       <div class="lyr"><b>UI</b><span style="color:var(--green)">live overlay</span></div>
       <div class="lyr"><b>CRM</b><span style="color:var(--green)">LIVE HubSpot _as</span></div>
     </div>
+  </div>
+</section>
+
+<!-- ============ THE UNFAIR ADVANTAGE ============ -->
+<section id="edge" class="wrap">
+  <div class="reveal">
+    <div class="eyebrow">// The unfair advantage</div>
+    <div class="stitle">It has seen every deal Beam ever ran</div>
+    <p class="ssub">Transcription is table stakes. The magic is what the brain compares against — 5,360 deals, ~107 closed-won, every loss. Three capabilities nobody else has, all built from parts you already shipped.</p>
+  </div>
+  <div class="subs reveal" style="grid-template-columns:repeat(3,1fr)">
+    <div class="cap" style="padding:24px">
+      <div class="ch"><div class="cic" style="background:rgba(66,245,155,.14);color:var(--green)">🧬</div><div><h3>Deal-DNA match, live</h3><span class="cw">closed-won + lost RAG</span></div></div>
+      <p style="font-size:13.5px;color:var(--mut);margin-top:6px">Mid-call, the deal bank surfaces the closest historical deals: <span class="y">"Sounds like <b>Apex Drywall</b> — won in 21 days, the play was the $300 pilot."</span> or <span class="no">"Careful — this mirrors <b>3 lost deals</b> that stalled on procurement."</span> The rep gets the winning move <i>and</i> the trap, in real time.</p>
+      <div class="when" style="margin-top:14px">Reuses <span class="mono">beam-predictive-sales-agent</span> win/loss DNA + <span class="mono">findSimilarWins()</span>.</div>
+    </div>
+    <div class="cap" style="padding:24px">
+      <div class="ch"><div class="cic" style="background:rgba(110,231,255,.14);color:var(--b)">🎬</div><div><h3>Pre-call simulation</h3><span class="cw">rehearse the win</span></div></div>
+      <p style="font-size:13.5px;color:var(--mut);margin-top:6px">Before the call, Assembly finds the most similar <b>closed-won</b> and generates a simulated walkthrough: how a winning call like this usually flows, the objections that came up, the exact questions that unlocked it. The rep walks in already knowing the path.</p>
+      <div class="when" style="margin-top:14px">AI council + deal bank → a "this is how you win this one" script.</div>
+    </div>
+    <div class="cap" style="padding:24px">
+      <div class="ch"><div class="cic" style="background:rgba(255,122,89,.14);color:var(--hub)">🛰️</div><div><h3>Right human, right moment</h3><span class="cw">Slack auto-routing</span></div></div>
+      <p style="font-size:13.5px;color:var(--mut);margin-top:6px">The bot is in <b>every</b> call, ambient. When something matters it taps the right person on Slack: a competitor named → SE; a $50k+ signal → manager; procurement blocker → RevOps; qualified → founder. The journey routes itself.</p>
+      <div class="when" style="margin-top:14px">Reuses <span class="mono">orbit</span>'s Slack layer (already posting in #revops-team).</div>
+    </div>
+  </div>
+
+  <div class="demo-cta reveal" style="margin-top:30px;border-color:rgba(124,139,255,.28);background:linear-gradient(120deg,rgba(124,139,255,.1),rgba(255,122,89,.05))">
+    <div class="dt"><h3>👤 The human stays in power</h3><p>The bot records and understands every call for the data bank and the customer journey — but the live copilot is the AE's to use when <i>they</i> want. Assist, never autopilot. No one is replaced; everyone is amplified.</p></div>
   </div>
 </section>
 
