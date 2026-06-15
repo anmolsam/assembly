@@ -1,0 +1,10 @@
+{
+  "name": "assembly",
+  "version": "0.1.0",
+  "description": "Live sales copilot for Beam AI — Recall.ai/AssemblyAI live transcription, real-time BANT council, HubSpot sync",
+  "type": "module",
+  "scripts": {
+    "live": "node live/server.js"
+  },
+  "license": "UNLICENSED"
+}

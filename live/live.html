@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Assembly · Live Sales Copilot (demo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#06070f;--ink:#eaf0ff;--mut:#8b93b7;--dim:#5a6188;--line:rgba(140,160,255,.13);
+    --card:rgba(20,24,46,.6);--green:#42f59b;--grn:rgba(66,245,155,.5);--accent:#7c8bff;--b:#6ee7ff;--a:#b388ff;--n:#7CFFCB;--t:#ffd166;--hub:#ff7a59}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:
+    radial-gradient(1000px 600px at 15% -10%,rgba(80,90,255,.16),transparent 60%),
+    radial-gradient(900px 700px at 90% 100%,rgba(66,245,155,.08),transparent 60%),#06070f;
+    color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.dh{font-family:'Space Grotesk',sans-serif;letter-spacing:-.02em}
+  .mono{font-family:'JetBrains Mono',monospace}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;backdrop-filter:blur(12px);background:rgba(6,7,15,.6);z-index:10}
+  .logo{display:flex;align-items:center;gap:11px;font-family:'Space Grotesk';font-weight:700;font-size:18px}
+  .logo .dot{width:13px;height:13px;border-radius:50%;background:conic-gradient(from 90deg,var(--b),var(--a),var(--n),var(--t),var(--b));box-shadow:0 0 16px var(--accent);animation:spin 6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .brain{font-family:'JetBrains Mono';font-size:11px;color:var(--mut);border:1px solid var(--line);padding:5px 11px;border-radius:8px}
+  .controls{display:flex;gap:10px;align-items:center}
+  button{font-family:'Space Grotesk';font-weight:600;font-size:14px;border:none;border-radius:11px;padding:11px 20px;cursor:pointer;transition:.2s}
+  .start{background:linear-gradient(120deg,#42f59b,#6ee7ff);color:#04130b}
+  .start:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px var(--grn)}
+  .stop{background:rgba(255,80,80,.15);color:#ff8989;border:1px solid rgba(255,80,80,.3)}
+  .stop:disabled,.start:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+  .status{font-family:'JetBrains Mono';font-size:12px;color:var(--mut);display:flex;align-items:center;gap:7px}
+  .status .d{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+  .status.live .d{background:var(--green);box-shadow:0 0 10px var(--grn);animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:26px 28px;display:grid;grid-template-columns:1.25fr .9fr;gap:22px}
+  @media(max-width:920px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;backdrop-filter:blur(10px)}
+  .ph{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .ph h3{font-size:15px} .ph .sub{font-size:11px;color:var(--dim);font-family:'JetBrains Mono'}
+
+  /* transcript */
+  #transcript{padding:18px 20px;height:520px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+  .turn{font-size:15px;line-height:1.5;padding:11px 15px;border-radius:13px;max-width:92%;animation:rise .3s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+  .turn.me{align-self:flex-end;background:linear-gradient(150deg,rgba(110,231,255,.14),rgba(110,231,255,.05));border:1px solid rgba(110,231,255,.2)}
+  .turn .spk{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.1em;color:var(--accent);margin-bottom:4px}
+  .partial{color:var(--mut);font-style:italic;padding:8px 15px;min-height:20px}
+  .partial .cur{display:inline-block;width:7px;height:15px;background:var(--green);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .empty{color:var(--dim);text-align:center;margin-top:180px;font-size:14px}
+
+  /* bant */
+  .ring-wrap{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid var(--line)}
+  .ring{position:relative;width:78px;height:78px;flex:none}.ring svg{transform:rotate(-90deg)}
+  .ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:'Space Grotesk';font-weight:700;font-size:20px}
+  .vinfo b{font-family:'Space Grotesk';font-size:15px}.vinfo span{font-size:12px;color:var(--mut)}
+  .qrow{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;transition:.35s}
+  .qrow .cat{font-family:'JetBrains Mono';font-size:10px;width:18px;height:18px;border-radius:5px;display:grid;place-items:center;flex:none;font-weight:600}
+  .cat.B{background:rgba(110,231,255,.15);color:var(--b)}.cat.A{background:rgba(179,136,255,.15);color:var(--a)}
+  .cat.N{background:rgba(124,255,203,.15);color:var(--n)}.cat.T{background:rgba(255,209,102,.15);color:var(--t)}
+  .qrow .chk{width:21px;height:21px;border-radius:7px;border:1.5px solid var(--line);display:grid;place-items:center;flex:none;font-size:12px;color:transparent;transition:.4s}
+  .qrow .lbl{flex:1;color:var(--mut)}
+  .qrow.yes .chk{background:var(--green);border-color:var(--green);color:#04130b;box-shadow:0 0 14px -2px var(--grn)}
+  .qrow.yes .lbl{color:var(--ink)}
+  .qrow.yes .sync{font-family:'JetBrains Mono';font-size:9px;color:var(--hub)}
+  .qrow .sync{opacity:0}.qrow.yes .sync{opacity:1}
+
+  /* copilot */
+  .copilot{margin:16px 20px 20px;border:1px solid rgba(66,245,155,.25);background:linear-gradient(150deg,rgba(66,245,155,.08),rgba(124,139,255,.05));border-radius:16px;padding:16px 18px}
+  .copilot .cl{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.16em;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .copilot .cl .d{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--grn);animation:pulse 1.4s infinite}
+  #suggestion{font-size:15px;line-height:1.5;font-weight:500}
+  .err{color:#ff8989;font-size:13px;padding:14px 20px}
+  .hint{font-size:12px;color:var(--dim);padding:0 20px 16px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><span class="dot"></span>ASSEMBLY <span style="color:var(--mut);font-weight:500;font-size:13px">· live copilot</span></div>
+  <div class="controls">
+    <span class="brain" id="brain">brain: …</span>
+    <span class="status" id="status"><span class="d"></span><span id="statusTxt">idle</span></span>
+    <button class="start" id="startBtn">▶ Start listening</button>
+    <button class="stop" id="stopBtn" disabled>■ Stop</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- live transcript -->
+  <div class="panel">
+    <div class="ph"><h3>🎙️ Live transcript</h3><span class="sub">AssemblyAI · u3-rt-pro</span></div>
+    <div id="transcript"><div class="empty">Click <b>Start listening</b> and talk. Your speech is transcribed live by AssemblyAI.<br><br>Try a mock sales line:<br><i>"We're a commercial drywall sub and we'd love to offload takeoffs to AI."</i></div></div>
+    <div class="partial" id="partial"></div>
+  </div>
+
+  <!-- bant + copilot -->
+  <div class="panel">
+    <div class="ph"><h3>🧠 BANT Qualification</h3><span class="sub" id="srcTag">live</span></div>
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="78" height="78"><circle cx="39" cy="39" r="33" stroke="rgba(255,255,255,.08)" stroke-width="6" fill="none"/>
+          <circle id="ringFill" cx="39" cy="39" r="33" stroke="url(#g)" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="207" stroke-dashoffset="207"/>
+          <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7ff"/><stop offset=".5" stop-color="#42f59b"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs></svg>
+        <div class="pct" id="pct">0<span style="font-size:11px">/9</span></div>
+      </div>
+      <div class="vinfo"><b id="verdict">Listening…</b><br><span id="verdictSub">Answers light up as they're confirmed on the call.</span></div>
+    </div>
+    <div id="qlist"></div>
+    <div class="copilot">
+      <div class="cl"><span class="d"></span>LIVE COPILOT — WHAT TO ASK NEXT</div>
+      <div id="suggestion">Start the call to get live coaching.</div>
+    </div>
+    <div class="hint">⚡ Each finalized sentence is scored against the 9 BANT questions in real time. Confirmed answers would sync to the HubSpot deal.</div>
+  </div>
+</div>
+
+<script>
+const BANT=[
+ {id:'trade_supported',cat:'N',lbl:'Trade supported'},
+ {id:'offload_willing',cat:'N',lbl:'Willing to offload to AI'},
+ {id:'tat_aligned',cat:'N',lbl:'Turnaround aligns'},
+ {id:'investment_confirmed',cat:'B',lbl:'$10k investment confirmed'},
+ {id:'decision_criteria',cat:'A',lbl:'Champion / decision-maker'},
+ {id:'approval_steps',cat:'A',lbl:'Approval steps mapped'},
+ {id:'close_90_days',cat:'T',lbl:'Can close in 90 days'},
+ {id:'deal_size_50k',cat:'T',lbl:'Deal size > $50k (if >90d)'},
+ {id:'pilot_300_confirmed',cat:'B',lbl:'$300 pilot confirmed'},
+];
+const qlist=document.getElementById('qlist');
+qlist.innerHTML=BANT.map(b=>`<div class="qrow" data-id="${b.id}"><span class="cat ${b.cat}">${b.cat}</span><span class="chk">✓</span><span class="lbl">${b.lbl}</span><span class="sync">↗ HubSpot</span></div>`).join('');
+
+const $=id=>document.getElementById(id);
+const C=207;
+function renderBant(bant,suggestion,source){
+  let n=0;
+  BANT.forEach(b=>{const row=qlist.querySelector(`[data-id="${b.id}"]`);const yes=bant[b.id]==='yes';row.classList.toggle('yes',yes);if(yes)n++;});
+  $('ringFill').style.strokeDashoffset=C-(n/9)*C;
+  $('pct').innerHTML=n+'<span style="font-size:11px">/9</span>';
+  $('srcTag').textContent=source==='llm'?'live · LLM':'live · heuristic';
+  if(n>=7){$('verdict').textContent='QUALIFIED';$('verdict').style.color='var(--green)';$('verdictSub').textContent='Mandatory + BANT threshold cleared.';}
+  else if(n>=4){$('verdict').textContent='Warming up';$('verdict').style.color='var(--t)';$('verdictSub').textContent='Strong signals — keep probing.';}
+  else if(n>=1){$('verdict').textContent='In progress';$('verdict').style.color='var(--b)';$('verdictSub').textContent='Capturing answers as they come.';}
+  if(suggestion)$('suggestion').textContent=suggestion;
+}
+
+// ---- pull brain mode ----
+fetch('/api/copilot',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({transcript:''})})
+  .then(r=>r.json()).then(j=>{$('brain').textContent='brain: '+(j.source==='llm'?'LLM ✓':'heuristic');}).catch(()=>{});
+
+// ---- live transcription ----
+let ws,audioCtx,workletNode,stream,running=false,transcript='',copilotBusy=false,lastSent='';
+
+async function start(){
+  $('startBtn').disabled=true;
+  setStatus('connecting','requesting mic…');
+  try{ stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}}); }
+  catch(e){ return fail('Microphone permission denied.'); }
+
+  setStatus('connecting','minting token…');
+  let token;
+  try{ const t=await fetch('/api/token').then(r=>r.json()); token=t.token; if(!token)throw new Error(t.error||'no token'); }
+  catch(e){ return fail('Token error: '+e.message); }
+
+  audioCtx=new AudioContext({sampleRate:16000});
+  await audioCtx.audioWorklet.addModule(workletURL());
+  const src=audioCtx.createMediaStreamSource(stream);
+  workletNode=new AudioWorkletNode(audioCtx,'pcm');
+  src.connect(workletNode);
+
+  ws=new WebSocket(`wss://streaming.assemblyai.com/v3/ws?sample_rate=16000&speech_model=u3-rt-pro&format_turns=true&token=${token}`);
+  ws.binaryType='arraybuffer';
+  ws.onopen=()=>{ running=true; setStatus('live','live'); $('stopBtn').disabled=false;
+    document.querySelector('.empty')?.remove();
+    workletNode.port.onmessage=e=>{ if(running&&ws.readyState===1) ws.send(e.data); };
+  };
+  ws.onmessage=ev=>{
+    const m=JSON.parse(ev.data);
+    if(m.type==='Turn'){
+      if(m.end_of_turn){ addTurn(m.transcript); $('partial').innerHTML=''; }
+      else { $('partial').innerHTML=esc(m.transcript)+'<span class="cur"></span>'; }
+    }
+  };
+  ws.onerror=()=>fail('Streaming connection error.');
+  ws.onclose=e=>{ if(running) setStatus('idle','closed ('+e.code+')'); running=false; };
+}
+
+function addTurn(text){
+  if(!text||!text.trim())return;
+  transcript+=' '+text;
+  const t=document.getElementById('transcript');
+  const div=document.createElement('div');
+  div.className='turn me';
+  div.innerHTML='<div class="spk">YOU (rep mic)</div>'+esc(text);
+  t.appendChild(div); t.scrollTop=t.scrollHeight;
+  runCopilot();
+}
+
+async function runCopilot(){
+  if(copilotBusy||transcript===lastSent)return;
+  copilotBusy=true; lastSent=transcript;
+  try{
+    const r=await fetch('/api/copilot',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({transcript})});
+    const j=await r.json();
+    renderBant(j.bant||{},j.suggestion,j.source);
+  }catch(e){} finally{ copilotBusy=false; if(transcript!==lastSent) runCopilot(); }
+}
+
+function stop(){
+  running=false;
+  try{ ws&&ws.readyState===1&&ws.send(JSON.stringify({type:'Terminate'})); }catch{}
+  try{ ws&&ws.close(); }catch{}
+  try{ workletNode&&workletNode.disconnect(); audioCtx&&audioCtx.close(); stream&&stream.getTracks().forEach(t=>t.stop()); }catch{}
+  setStatus('idle','stopped'); $('startBtn').disabled=false; $('stopBtn').disabled=true; $('partial').innerHTML='';
+}
+function fail(msg){ setStatus('idle','error'); const t=document.getElementById('transcript'); const d=document.createElement('div'); d.className='err'; d.textContent='⚠ '+msg; t.appendChild(d); $('startBtn').disabled=false; }
+function setStatus(cls,txt){ const s=$('status'); s.className='status'+(cls==='live'?' live':''); $('statusTxt').textContent=txt; }
+function esc(s){ return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+// AudioWorklet: buffer 16k mono float -> Int16 PCM, emit ~100ms (1600 samples) chunks
+function workletURL(){
+  const code=`class P extends AudioWorkletProcessor{constructor(){super();this.buf=[]}process(inputs){const ch=inputs[0][0];if(ch){for(let i=0;i<ch.length;i++)this.buf.push(ch[i]);if(this.buf.length>=1600){const s=this.buf.splice(0,this.buf.length);const pcm=new Int16Array(s.length);for(let i=0;i<s.length;i++){let v=Math.max(-1,Math.min(1,s[i]));pcm[i]=v<0?v*0x8000:v*0x7FFF}this.port.postMessage(pcm.buffer,[pcm.buffer])}}return true}}registerProcessor('pcm',P)`;
+  return URL.createObjectURL(new Blob([code],{type:'application/javascript'}));
+}
+
+$('startBtn').onclick=start;
+$('stopBtn').onclick=stop;
+</script>
+</body>
+</html>
